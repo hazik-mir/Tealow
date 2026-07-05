@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeaLow — one steep, every model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#141F1A;
+    --bg-2:#0F1713;
+    --surface:#1C2A23;
+    --surface-hi:#24352C;
+    --line: rgba(237,234,224,0.10);
+    --ink:#EDEAE0;
+    --ink-dim:#9CB0A2;
+    --ink-faint:#6C7D73;
+    --amber:#E3A857;
+    --amber-hi:#F2C077;
+    --jade:#6FA98A;
+    --jade-hi:#8CC4A6;
+    --oolong:#C97B4A;
+    --silver:#CBD5CE;
+
+    --font-display: 'Fraunces', serif;
+    --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --radius: 14px;
+    --ease: cubic-bezier(.22,1,.36,1);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
+  }
+
+  body{
+    background:
+      radial-gradient(ellipse 70% 50% at 15% -10%, rgba(111,169,138,0.10), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(227,168,87,0.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  a{ color:inherit; }
+  ::selection{ background:var(--amber); color:#141F1A; }
+
+  :focus-visible{
+    outline:2px solid var(--amber-hi);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  .wrap{ max-width:1100px; margin:0 auto; padding:0 28px; }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(20,31,26,0.78);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; height:64px; }
+  .brand{ display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:600; font-size:1.25rem; letter-spacing:0.01em; }
+  .brand .leaf{ width:20px; height:20px; }
+  .navlinks{ display:flex; gap:26px; list-style:none; font-size:0.88rem; color:var(--ink-dim); }
+  .navlinks a{ text-decoration:none; position:relative; padding:4px 0; transition:color .25s var(--ease); }
+  .navlinks a:hover{ color:var(--amber-hi); }
+  .navlinks a::after{
+    content:''; position:absolute; left:0; bottom:-2px; width:0; height:1px; background:var(--amber-hi);
+    transition:width .3s var(--ease);
+  }
+  .navlinks a:hover::after{ width:100%; }
+  .navcta{
+    font-size:0.82rem; padding:8px 16px; border:1px solid var(--line); border-radius:100px;
+    color:var(--ink); text-decoration:none; white-space:nowrap; transition:all .25s var(--ease);
+  }
+  .navcta:hover{ border-color:var(--amber); color:var(--amber-hi); }
+  @media (max-width:820px){ .navlinks{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding:96px 0 60px; position:relative; }
+  .hero-grid{ display:grid; grid-template-columns:1.15fr 0.85fr; gap:56px; align-items:center; }
+  @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--jade-hi); padding:6px 12px; border:1px solid rgba(111,169,138,0.35); border-radius:100px;
+    background:rgba(111,169,138,0.08);
+    opacity:0; animation:riseIn .7s var(--ease) forwards;
+  }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--jade-hi); animation:pulse 2.2s ease-in-out infinite; }
+
+  h1{
+    font-family:var(--font-display); font-weight:600; letter-spacing:-0.01em;
+    font-size:clamp(2.5rem, 5.4vw, 3.7rem); line-height:1.04; margin:22px 0 20px;
+    opacity:0; animation:riseIn .8s var(--ease) .12s forwards;
+  }
+  h1 em{ font-style:italic; color:var(--amber-hi); font-weight:500; }
+
+  .hero p.lede{
+    font-size:1.08rem; color:var(--ink-dim); max-width:46ch; margin-bottom:30px;
+    opacity:0; animation:riseIn .8s var(--ease) .22s forwards;
+  }
+  .hero .actions{ display:flex; gap:14px; flex-wrap:wrap; opacity:0; animation:riseIn .8s var(--ease) .32s forwards; }
+
+  .btn{
+    font-family:var(--font-body); font-weight:600; font-size:0.92rem;
+    padding:13px 22px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    transition:transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease);
+  }
+  .btn-primary{ background:var(--amber); color:#20180B; box-shadow:0 8px 24px -8px rgba(227,168,87,0.55); }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 28px -8px rgba(227,168,87,0.7); background:var(--amber-hi); }
+  .btn-ghost{ border:1px solid var(--line); color:var(--ink); }
+  .btn-ghost:hover{ border-color:var(--jade); color:var(--jade-hi); transform:translateY(-2px); }
+
+  @keyframes riseIn{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+  @keyframes pulse{ 0%,100%{ opacity:1; transform:scale(1);} 50%{ opacity:0.4; transform:scale(0.7);} }
+
+  /* ---------- TEACUP SIGNATURE ---------- */
+  .cup-stage{
+    position:relative; display:flex; align-items:center; justify-content:center; height:340px;
+    opacity:0; animation:riseIn 1s var(--ease) .3s forwards;
+  }
+  .steam{ position:absolute; bottom:190px; }
+  .steam span{
+    position:absolute; bottom:0; width:3px; height:40px; border-radius:3px;
+    background:linear-gradient(to top, rgba(237,234,224,0.0), rgba(237,234,224,0.5), rgba(237,234,224,0.0));
+    animation:steamRise 3.2s ease-in-out infinite;
+    filter:blur(1.5px);
+  }
+  .steam span:nth-child(1){ left:-16px; animation-delay:0s; }
+  .steam span:nth-child(2){ left:0px; animation-delay:0.8s; height:50px; }
+  .steam span:nth-child(3){ left:16px; animation-delay:1.6s; }
+  @keyframes steamRise{
+    0%{ transform:translateY(0) scaleX(1); opacity:0; }
+    15%{ opacity:0.8; }
+    100%{ transform:translateY(-110px) scaleX(1.6); opacity:0; }
+  }
+
+  svg#cup{ width:230px; height:230px; overflow:visible; }
+  #liquid{ transition: fill 0.6s var(--ease); }
+  .cup-label{
+    font-family:var(--font-mono); font-size:0.7rem; text-align:center; color:var(--ink-faint);
+    letter-spacing:0.08em; text-transform:uppercase; margin-top:8px;
+  }
+  .cup-label b{ color:var(--amber-hi); font-weight:600; }
+
+  /* ---------- PROVIDER SWITCH ---------- */
+  .switcher{ margin-top:56px; }
+  .switch-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+  .switch-head h2{ font-family:var(--font-display); font-weight:600; font-size:1.5rem; }
+  .switch-head p{ color:var(--ink-faint); font-size:0.9rem; }
+
+  .pills{ display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+  .pill{
+    font-family:var(--font-mono); font-size:0.82rem; padding:9px 16px; border-radius:100px;
+    border:1px solid var(--line); background:var(--surface); color:var(--ink-dim); cursor:pointer;
+    transition:all .25s var(--ease); position:relative;
+  }
+  .pill:hover{ color:var(--ink); border-color:var(--ink-faint); }
+  .pill.active{ color:#141F1A; font-weight:600; border-color:transparent; }
+  .pill .swatch{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; vertical-align:middle; }
+
+  .codepanel{
+    background:var(--bg-2); border:1px solid var(--line); border-radius:var(--radius);
+    overflow:hidden; box-shadow:0 20px 50px -25px rgba(0,0,0,0.6);
+  }
+  .codepanel .bar{
+    display:flex; align-items:center; justify-content:space-between; padding:10px 16px;
+    border-bottom:1px solid var(--line); background:rgba(255,255,255,0.02);
+  }
+  .bar .dots{ display:flex; gap:6px; }
+  .bar .dots span{ width:10px; height:10px; border-radius:50%; background:var(--surface-hi); }
+  .bar .filename{ font-family:var(--font-mono); font-size:0.76rem; color:var(--ink-faint); }
+  .copy-btn{
+    font-family:var(--font-mono); font-size:0.72rem; color:var(--ink-faint); background:transparent;
+    border:1px solid var(--line); border-radius:6px; padding:5px 10px; cursor:pointer; transition:all .2s var(--ease);
+  }
+  .copy-btn:hover{ color:var(--amber-hi); border-color:var(--amber); }
+  pre{ margin:0; padding:22px; overflow-x:auto; font-family:var(--font-mono); font-size:0.88rem; line-height:1.7; }
+  code{ font-family:var(--font-mono); }
+
+  .tok-kw{ color:#F2C077; }
+  .tok-str{ color:#8CC4A6; }
+  .tok-com{ color:#6C7D73; font-style:italic; }
+  .tok-fn{ color:#CBD5CE; }
+  .tok-num{ color:#C97B4A; }
+
+  /* ---------- SECTION HEADERS ---------- */
+  section{ padding:70px 0; }
+  .section-head{ max-width:640px; margin-bottom:44px; }
+  .section-head .eyebrow{ animation:none; opacity:1; margin-bottom:14px; }
+  .section-head h2{ font-family:var(--font-display); font-weight:600; font-size:clamp(1.8rem,3vw,2.4rem); margin-bottom:12px; }
+  .section-head p{ color:var(--ink-dim); font-size:1rem; }
+
+  hr.divider{ border:none; border-top:1px solid var(--line); }
+
+  /* ---------- CARDS GRID ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:20px; }
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; display:flex; flex-direction:column; gap:14px;
+    opacity:0; transform:translateY(18px);
+    transition:transform .5s var(--ease), opacity .5s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .card.in-view{ opacity:1; transform:translateY(0); }
+  .card:hover{ border-color:rgba(227,168,87,0.4); box-shadow:0 18px 40px -22px rgba(0,0,0,0.55); transform:translateY(-4px); }
+
+  .card .tag{
+    font-family:var(--font-mono); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.1em;
+    color:var(--jade-hi); display:inline-flex; align-items:center; gap:6px; width:fit-content;
+  }
+  .card h3{ font-family:var(--font-display); font-weight:600; font-size:1.2rem; }
+  .card p{ color:var(--ink-dim); font-size:0.92rem; }
+  .card pre{ padding:16px; font-size:0.8rem; background:var(--bg-2); border-radius:10px; border:1px solid var(--line); }
+  .card pre::-webkit-scrollbar{ height:6px; }
+  .card pre::-webkit-scrollbar-thumb{ background:var(--surface-hi); border-radius:4px; }
+
+  /* mark highlight */
+  mark{
+    background:linear-gradient(180deg, transparent 62%, rgba(227,168,87,0.35) 62%);
+    color:var(--amber-hi); font-weight:600; padding:0 2px;
+  }
+  .glow-word{
+    background:linear-gradient(90deg, var(--amber-hi), var(--jade-hi), var(--amber-hi));
+    background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 5s linear infinite;
+  }
+  @keyframes shine{ to{ background-position:-200% center; } }
+
+  /* ---------- MODELS TABLE ---------- */
+  .menu{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+  }
+  .menu-row{
+    display:grid; grid-template-columns:1.1fr 1.6fr 1fr; gap:16px; padding:18px 24px; align-items:center;
+    border-bottom:1px solid var(--line); transition:background .25s var(--ease);
+  }
+  .menu-row:last-child{ border-bottom:none; }
+  .menu-row:hover{ background:rgba(255,255,255,0.02); }
+  .menu-row.head{ font-family:var(--font-mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-faint); }
+  .provider-name{ display:flex; align-items:center; gap:10px; font-weight:600; }
+  .provider-name .swatch{ width:10px; height:10px; border-radius:50%; }
+  .menu-row .models{ font-family:var(--font-mono); font-size:0.85rem; color:var(--ink-dim); }
+  .menu-row .detect{ font-family:var(--font-mono); font-size:0.8rem; color:var(--ink-faint); }
+  @media (max-width:700px){ .menu-row{ grid-template-columns:1fr; gap:6px; } }
+
+  /* ---------- CREDITS ---------- */
+  footer{ padding:70px 0 50px; border-top:1px solid var(--line); margin-top:40px; }
+  .credit-card{
+    background:radial-gradient(ellipse 120% 140% at 0% 0%, rgba(227,168,87,0.10), transparent 60%), var(--surface);
+    border:1px solid var(--line); border-radius:var(--radius); padding:38px;
+    display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
+  }
+  .credit-card h3{ font-family:var(--font-display); font-size:1.4rem; margin-bottom:6px; }
+  .credit-card p{ color:var(--ink-dim); font-size:0.92rem; }
+  .credit-card a.site{
+    font-family:var(--font-mono); font-size:0.85rem; color:var(--amber-hi); text-decoration:none; border-bottom:1px dashed var(--amber);
+  }
+  .foot-meta{ margin-top:26px; display:flex; justify-content:space-between; color:var(--ink-faint); font-size:0.8rem; flex-wrap:wrap; gap:8px; }
+  .foot-meta a{ color:var(--ink-faint); text-decoration:none; }
+  .foot-meta a:hover{ color:var(--amber-hi); }
+
+  .install-block{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:700px){ .install-block{ grid-template-columns:1fr; } }
+  .install-block .codepanel pre{ font-size:0.82rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">
+      <svg class="leaf" viewBox="0 0 24 24" fill="none"><path d="M4 13c0-6 5-9 15-9-1 9-5 13-11 13-2 0-3-1-4-2" stroke="#E3A857" stroke-width="1.6" stroke-linecap="round"/><path d="M4 20c2-3 4-5 7-6" stroke="#6FA98A" stroke-width="1.6" stroke-linecap="round"/></svg>
+      TeaLow
+    </div>
+    <ul class="navlinks">
+      <li><a href="#install">Install</a></li>
+      <li><a href="#usage">Usage</a></li>
+      <li><a href="#models">Models</a></li>
+      <li><a href="#credits">Credits</a></li>
+    </ul>
+    <a class="navcta" href="https://github.com/tealow/tealow" target="_blank" rel="noopener">View on GitHub →</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow"><span class="dot"></span> One SDK, four providers</span>
+      <h1>Every model,<br>steeped through <em>one</em> cup.</h1>
+      <p class="lede">TeaLow is a unified AI SDK for Python. Write your call once against <mark>Gemini</mark>, <mark>OpenAI</mark>, <mark>Claude</mark>, or <mark>DeepSeek</mark> — swap the model name, keep everything else.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#install">pip install TeaLow</a>
+        <a class="btn btn-ghost" href="#usage">Read the docs</a>
+      </div>
+    </div>
+
+    <div class="cup-stage">
+      <div class="steam"><span></span><span></span><span></span></div>
+      <div>
+        <svg id="cup" viewBox="0 0 200 190">
+          <ellipse cx="90" cy="150" rx="70" ry="12" fill="#0F1713" opacity="0.5"/>
+          <path d="M30 55 H150 L138 145 Q134 158 120 158 H60 Q46 158 42 145 Z" fill="#0F1713" stroke="rgba(237,234,224,0.12)" stroke-width="2"/>
+          <path id="liquid" d="M38 70 H142 L134 140 Q131 150 120 150 H60 Q49 150 46 140 Z" fill="#8CC4A6"/>
+          <ellipse cx="90" cy="70" rx="52" ry="8" fill="#0F1713" opacity="0.35"/>
+          <path d="M150 70 Q182 70 182 100 Q182 128 150 122" fill="none" stroke="rgba(237,234,224,0.12)" stroke-width="8" stroke-linecap="round"/>
+          <rect x="20" y="45" width="140" height="14" rx="7" fill="#182620" stroke="rgba(237,234,224,0.12)" stroke-width="2"/>
+        </svg>
+        <p class="cup-label">now brewing — <b id="cup-provider">Anthropic Claude</b></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap switcher">
+    <div class="switch-head">
+      <h2>Change the leaf, <span class="glow-word">not the recipe</span></h2>
+      <p>Same three lines of code. Tap a provider.</p>
+    </div>
+    <div class="pills" id="pills" role="tablist" aria-label="Choose a provider">
+      <button class="pill active" data-p="claude" role="tab" aria-selected="true"><span class="swatch" style="background:#C97B4A"></span>Claude</button>
+      <button class="pill" data-p="gemini" role="tab" aria-selected="false"><span class="swatch" style="background:#8CC4A6"></span>Gemini</button>
+      <button class="pill" data-p="openai" role="tab" aria-selected="false"><span class="swatch" style="background:#EDEAE0"></span>OpenAI</button>
+      <button class="pill" data-p="deepseek" role="tab" aria-selected="false"><span class="swatch" style="background:#8FB8D8"></span>DeepSeek</button>
+    </div>
+
+    <div class="codepanel">
+      <div class="bar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="filename">brew.py</span>
+        <button class="copy-btn" id="copy-hero">copy</button>
+      </div>
+      <pre><code id="hero-code"></code></pre>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section id="install">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow"><span class="dot"></span> Getting started</span>
+        <h2>Install the leaves</h2>
+        <p>One package, works everywhere <mark>Python 3.9+</mark> runs.</p>
+      </div>
+      <div class="install-block">
+        <div class="codepanel">
+          <div class="bar"><div class="dots"><span></span><span></span><span></span></div><span class="filename">terminal</span><button class="copy-btn" data-copy="pip install TeaLow">copy</button></div>
+          <pre><code><span class="tok-com"># from PyPI</span>
+pip install TeaLow</code></pre>
+        </div>
+        <div class="codepanel">
+          <div class="bar"><div class="dots"><span></span><span></span><span></span></div><span class="filename">terminal</span><button class="copy-btn" data-copy="git clone https://github.com/tealow/tealow.git
+cd tealow
+pip install -e &quot;.[dev]&quot;">copy</button></div>
+          <pre><code><span class="tok-com"># from source</span>
+git clone https://github.com/tealow/tealow.git
+cd tealow
+pip install -e <span class="tok-str">".[dev]"</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="usage">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow"><span class="dot"></span> Reference</span>
+        <h2>Every way to <span class="glow-word">steep</span> a request</h2>
+        <p>Eleven patterns, one import. Each card is a complete, runnable snippet.</p>
+      </div>
+
+      <div class="grid" id="card-grid">
+
+        <div class="card"><span class="tag">01 · Basics</span>
+          <h3>Send your first message</h3>
+          <p>Pass a <mark>model</mark> and an <mark>api</mark> key — the provider is detected from the model name.</p>
+          <pre><code><span class="tok-kw">from</span> TeaLow <span class="tok-kw">import</span> TeaLow
+
+ai = TeaLow(model=<span class="tok-str">"gemini-2.5-flash"</span>, api=<span class="tok-str">"YOUR_API_KEY"</span>)
+<span class="tok-fn">print</span>(ai.send(<span class="tok-str">"Hello!"</span>))</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">02 · Config</span>
+          <h3>Use environment variables</h3>
+          <p>Skip <mark>api=</mark> entirely by exporting the provider's standard key variable.</p>
+          <pre><code><span class="tok-com"># export OPENAI_API_KEY="sk-..."</span>
+<span class="tok-kw">from</span> TeaLow <span class="tok-kw">import</span> TeaLow
+ai = TeaLow(model=<span class="tok-str">"gpt-4o-mini"</span>)
+<span class="tok-fn">print</span>(ai.send(<span class="tok-str">"Hello!"</span>))</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">03 · Memory</span>
+          <h3>Multi-turn conversation</h3>
+          <p>Set a <mark>system_prompt</mark> once, then read every turn back from <mark>ai.history</mark>.</p>
+          <pre><code>ai = TeaLow(model=<span class="tok-str">"claude-sonnet-4-6"</span>, api=<span class="tok-str">"KEY"</span>,
+            system_prompt=<span class="tok-str">"You are a helpful pirate."</span>)
+ai.send(<span class="tok-str">"What's your name?"</span>)
+<span class="tok-kw">for</span> m <span class="tok-kw">in</span> ai.history:
+    <span class="tok-fn">print</span>(m[<span class="tok-str">"role"</span>], <span class="tok-str">"->"</span>, m[<span class="tok-str">"content"</span>])</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">04 · Streaming</span>
+          <h3>Stream tokens as they arrive</h3>
+          <p>Iterate over <mark>ai.stream()</mark> and print each <mark>chunk.delta</mark> live.</p>
+          <pre><code><span class="tok-kw">for</span> chunk <span class="tok-kw">in</span> ai.stream(<span class="tok-str">"Write a haiku about the ocean."</span>):
+    <span class="tok-fn">print</span>(chunk.delta, end=<span class="tok-str">""</span>, flush=<span class="tok-kw">True</span>)</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">05 · Async</span>
+          <h3>Async client, same shape</h3>
+          <p><mark>AsyncTeaLow</mark> mirrors the sync API for asyncio apps and servers.</p>
+          <pre><code><span class="tok-kw">import</span> asyncio
+<span class="tok-kw">from</span> TeaLow <span class="tok-kw">import</span> AsyncTeaLow
+
+<span class="tok-kw">async def</span> <span class="tok-fn">main</span>():
+    ai = AsyncTeaLow(model=<span class="tok-str">"gemini-2.5-flash"</span>, api=<span class="tok-str">"KEY"</span>)
+    <span class="tok-fn">print</span>(<span class="tok-kw">await</span> ai.send(<span class="tok-str">"Hello from asyncio!"</span>))
+    <span class="tok-kw">await</span> ai.close()
+
+asyncio.run(main())</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">06 · Vision</span>
+          <h3>Send an image along</h3>
+          <p>Load a file with <mark>TeaLow.load_image()</mark> and pass it via <mark>images=</mark>.</p>
+          <pre><code>image = TeaLow.load_image(path=<span class="tok-str">"photo.jpg"</span>)
+response = ai.send(<span class="tok-str">"What is in this image?"</span>, images=[image])
+<span class="tok-fn">print</span>(response)</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">07 · Structured</span>
+          <h3>JSON mode</h3>
+          <p>Set <mark>json_mode=True</mark> and parse <mark>response.text</mark> straight into Python.</p>
+          <pre><code>response = ai.send(
+    <span class="tok-str">"Return JSON with keys 'name' and 'age'."</span>,
+    json_mode=<span class="tok-kw">True</span>,
+)
+data = json.loads(response.text)</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">08 · Generation</span>
+          <h3>Generate an image</h3>
+          <p>Point the model at an image generator like <mark>dall-e-3</mark> and call <mark>generate_image()</mark>.</p>
+          <pre><code>ai = TeaLow(model=<span class="tok-str">"dall-e-3"</span>, api=<span class="tok-str">"KEY"</span>)
+urls = ai.generate_image(<span class="tok-str">"A watercolor teapot on a low table"</span>)
+<span class="tok-fn">print</span>(urls[0])</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">09 · Transport</span>
+          <h3>Headers, proxy &amp; timeouts</h3>
+          <p>Tune <mark>timeout</mark>, <mark>max_retries</mark>, <mark>proxies</mark>, and custom <mark>headers</mark> per client.</p>
+          <pre><code>ai = TeaLow(
+    model=<span class="tok-str">"gpt-4o-mini"</span>, api=<span class="tok-str">"KEY"</span>,
+    timeout=<span class="tok-num">30.0</span>, max_retries=<span class="tok-num">5</span>,
+    proxies={<span class="tok-str">"https"</span>: <span class="tok-str">"http://proxy.internal:8080"</span>},
+    headers={<span class="tok-str">"X-Org-Id"</span>: <span class="tok-str">"acme-corp"</span>},
+)</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">10 · Observability</span>
+          <h3>Turn on logging</h3>
+          <p>Call <mark>configure_logging()</mark> once at startup to see request-level detail.</p>
+          <pre><code><span class="tok-kw">from</span> TeaLow <span class="tok-kw">import</span> configure_logging
+<span class="tok-kw">import</span> logging
+configure_logging(level=logging.DEBUG)</code></pre>
+        </div>
+
+        <div class="card"><span class="tag">11 · Resilience</span>
+          <h3>Handle errors gracefully</h3>
+          <p>Catch <mark>RateLimitError</mark> and <mark>InvalidAPIKeyError</mark> specifically, or <mark>TeaLowError</mark> for everything else.</p>
+          <pre><code><span class="tok-kw">try</span>:
+    response = ai.send(<span class="tok-str">"Hello!"</span>)
+<span class="tok-kw">except</span> RateLimitError <span class="tok-kw">as</span> e:
+    <span class="tok-fn">print</span>(<span class="tok-str">"Retry after:"</span>, e.retry_after)
+<span class="tok-kw">except</span> InvalidAPIKeyError:
+    <span class="tok-fn">print</span>(<span class="tok-str">"Key was rejected."</span>)</code></pre>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="models">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow"><span class="dot"></span> Menu</span>
+        <h2>Four leaves, one pot</h2>
+        <p>The model name alone tells TeaLow which provider to <mark>brew</mark> with.</p>
+      </div>
+
+      <div class="menu">
+        <div class="menu-row head"><span>Provider</span><span>Models</span><span>Detected by</span></div>
+
+        <div class="menu-row">
+          <span class="provider-name"><span class="swatch" style="background:#8CC4A6"></span>Gemini</span>
+          <span class="models">gemini-2.5-flash · gemini-2.5-pro</span>
+          <span class="detect">"gemini"</span>
+        </div>
+        <div class="menu-row">
+          <span class="provider-name"><span class="swatch" style="background:#EDEAE0"></span>OpenAI</span>
+          <span class="models">gpt-4o · gpt-4o-mini · o3 · dall-e-3</span>
+          <span class="detect">"gpt-", "o1/o3/o4", "dall-e"</span>
+        </div>
+        <div class="menu-row">
+          <span class="provider-name"><span class="swatch" style="background:#C97B4A"></span>Anthropic</span>
+          <span class="models">claude-sonnet-4-6 · claude-opus-4-8</span>
+          <span class="detect">"claude"</span>
+        </div>
+        <div class="menu-row">
+          <span class="provider-name"><span class="swatch" style="background:#8FB8D8"></span>DeepSeek</span>
+          <span class="models">deepseek-chat · deepseek-reasoner</span>
+          <span class="detect">"deepseek"</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer id="credits">
+  <div class="wrap">
+    <div class="credit-card">
+      <div>
+        <h3>Built &amp; designed by Hazik Mir</h3>
+        <p>TeaLow was designed and built by Hazik Mir, and is released under the MIT License.</p>
+      </div>
+      <a class="site" href="https://hazik-mir.github.io/" target="_blank" rel="noopener">hazik-mir.github.io ↗</a>
+    </div>
+    <div class="foot-meta">
+      <span>© 2025 Hazik Mir and TeaLow Contributors.</span>
+      <a href="https://github.com/tealow/tealow" target="_blank" rel="noopener">github.com/tealow/tealow</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var providers = {
+    claude: {
+      liquid: "#C97B4A", label: "Anthropic Claude",
+      lines: [
+        ['tok-kw','from'],[null,' TeaLow '],['tok-kw','import'],[null,' TeaLow'],['br'],['br'],
+        [null,'ai = TeaLow(model='],['tok-str','"claude-sonnet-4-6"'],[null,', api='],['tok-str','"YOUR_ANTHROPIC_KEY"'],[null,')'],['br'],
+        ['tok-fn','print'],[null,'(ai.send('],['tok-str','"Hello!"'],[null,'))']
+      ],
+      raw: 'from TeaLow import TeaLow\n\nai = TeaLow(model="claude-sonnet-4-6", api="YOUR_ANTHROPIC_KEY")\nprint(ai.send("Hello!"))'
+    },
+    gemini: {
+      liquid: "#8CC4A6", label: "Google Gemini",
+      lines: [
+        ['tok-kw','from'],[null,' TeaLow '],['tok-kw','import'],[null,' TeaLow'],['br'],['br'],
+        [null,'ai = TeaLow(model='],['tok-str','"gemini-2.5-flash"'],[null,', api='],['tok-str','"YOUR_API_KEY"'],[null,')'],['br'],
+        ['tok-fn','print'],[null,'(ai.send('],['tok-str','"Hello!"'],[null,'))']
+      ],
+      raw: 'from TeaLow import TeaLow\n\nai = TeaLow(model="gemini-2.5-flash", api="YOUR_API_KEY")\nprint(ai.send("Hello!"))'
+    },
+    openai: {
+      liquid: "#DDD3B8", label: "OpenAI",
+      lines: [
+        ['tok-kw','from'],[null,' TeaLow '],['tok-kw','import'],[null,' TeaLow'],['br'],['br'],
+        [null,'ai = TeaLow(model='],['tok-str','"gpt-4o-mini"'],[null,', api='],['tok-str','"YOUR_OPENAI_KEY"'],[null,')'],['br'],
+        ['tok-fn','print'],[null,'(ai.send('],['tok-str','"Hello!"'],[null,'))']
+      ],
+      raw: 'from TeaLow import TeaLow\n\nai = TeaLow(model="gpt-4o-mini", api="YOUR_OPENAI_KEY")\nprint(ai.send("Hello!"))'
+    },
+    deepseek: {
+      liquid: "#8FB8D8", label: "DeepSeek",
+      lines: [
+        ['tok-kw','from'],[null,' TeaLow '],['tok-kw','import'],[null,' TeaLow'],['br'],['br'],
+        [null,'ai = TeaLow(model='],['tok-str','"deepseek-chat"'],[null,', api='],['tok-str','"YOUR_DEEPSEEK_KEY"'],[null,')'],['br'],
+        ['tok-fn','print'],[null,'(ai.send('],['tok-str','"Hello!"'],[null,'))']
+      ],
+      raw: 'from TeaLow import TeaLow\n\nai = TeaLow(model="deepseek-chat", api="YOUR_DEEPSEEK_KEY")\nprint(ai.send("Hello!"))'
+    }
+  };
+
+  var pills = document.querySelectorAll('.pill');
+  var codeEl = document.getElementById('hero-code');
+  var liquid = document.getElementById('liquid');
+  var cupProviderLabel = document.getElementById('cup-provider');
+  var heroRaw = providers.claude.raw;
+
+  function render(key){
+    var p = providers[key];
+    heroRaw = p.raw;
+    var html = '';
+    p.lines.forEach(function(tok){
+      if(tok[0] === 'br'){ html += '\n'; return; }
+      if(tok[0]){ html += '<span class="'+tok[0]+'">'+tok[1]+'</span>'; }
+      else { html += tok[1]; }
+    });
+    codeEl.innerHTML = html;
+    liquid.style.fill = p.liquid;
+    cupProviderLabel.textContent = p.label;
+  }
+
+  pills.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      pills.forEach(function(b){ b.classList.remove('active'); b.setAttribute('aria-selected','false'); b.style.background=''; });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected','true');
+      var color = getComputedStyle(btn.querySelector('.swatch')).backgroundColor;
+      btn.style.background = color;
+      render(btn.dataset.p);
+    });
+  });
+
+  // init active pill background
+  var initial = document.querySelector('.pill.active');
+  initial.style.background = getComputedStyle(initial.querySelector('.swatch')).backgroundColor;
+  render('claude');
+
+  // copy buttons
+  document.getElementById('copy-hero').addEventListener('click', function(){
+    navigator.clipboard.writeText(heroRaw).then(function(){
+      var btn = document.getElementById('copy-hero');
+      var old = btn.textContent; btn.textContent = 'copied ✓';
+      setTimeout(function(){ btn.textContent = old; }, 1400);
+    });
+  });
+
+  document.querySelectorAll('.copy-btn[data-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(btn.dataset.copy).then(function(){
+        var old = btn.textContent; btn.textContent = 'copied ✓';
+        setTimeout(function(){ btn.textContent = old; }, 1400);
+      });
+    });
+  });
+
+  // scroll reveal for cards
+  var cards = document.querySelectorAll('.card');
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('in-view');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  cards.forEach(function(c, i){
+    c.style.transitionDelay = (i % 3) * 70 + 'ms';
+    obs.observe(c);
+  });
+})();
+</script>
+
+</body>
+</html>
+
