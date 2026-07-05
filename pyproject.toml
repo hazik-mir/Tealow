@@ -1,0 +1,101 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "TeaLow"
+version = "1.0.0"
+description = "A unified AI SDK for Google Gemini, OpenAI, Anthropic Claude, and DeepSeek."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+authors = [
+    { name = "TeaLow Contributors" },
+]
+keywords = [
+    "ai",
+    "sdk",
+    "llm",
+    "gemini",
+    "openai",
+    "anthropic",
+    "claude",
+    "deepseek",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "requests>=2.31.0",
+    "httpx>=0.25.0",
+    "typing-extensions>=4.7.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "responses>=0.23.0",
+    "ruff>=0.4.0",
+    "black>=24.1.0",
+    "mypy>=1.8.0",
+    "build>=1.0.0",
+    "pre-commit>=3.5.0",
+    "types-requests>=2.31.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/tealow/tealow"
+Documentation = "https://github.com/tealow/tealow/tree/main/docs"
+Repository = "https://github.com/tealow/tealow"
+Changelog = "https://github.com/tealow/tealow/blob/main/CHANGELOG.md"
+Issues = "https://github.com/tealow/tealow/issues"
+
+[tool.setuptools]
+packages = ["TeaLow", "TeaLow.providers"]
+
+[tool.setuptools.package-data]
+TeaLow = ["py.typed"]
+
+[tool.black]
+line-length = 95
+target-version = ["py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 95
+target-version = "py39"
+src = ["TeaLow", "tests", "examples"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["TeaLow"]
+
+[tool.mypy]
+python_version = "3.9"
+packages = ["TeaLow"]
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+exclude = ["tests", "examples", "docs"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --cov=TeaLow --cov-report=term-missing"
